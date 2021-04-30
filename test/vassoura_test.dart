@@ -18,4 +18,13 @@ void main() {
       );
     });
   });
+  test('maps a file to its imports', () async {
+    final file = File('test/vassoura_test.dart');
+    final imports = await mapFileToImports(file);
+    expect(imports, {
+      "import 'dart:io';",
+      "import 'package:vassoura/src/vassoura.dart';",
+      "import 'package:test/test.dart';",
+    });
+  });
 }
