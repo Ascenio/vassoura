@@ -3,7 +3,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:mime/mime.dart';
+import 'package:vassoura/src/file_with_metadata.dart';
 import 'package:vassoura/vassoura.dart';
+
+import 'transformers/file_with_metadata_stream_transformer.dart';
 
 Stream<File> getDartFiles(Directory directory) {
   return directory
@@ -34,4 +37,10 @@ Future<bool> fileHasMain(File file) async {
   final program = await file.readAsString();
   final hasMain = programHasMain(program);
   return hasMain;
+}
+
+Stream<FileWithMetada> filesToDelete(Directory directory) {
+  return getDartFiles(directory)
+      .transform(FileWithMetadataStreamTransformer())
+      .where((file) => !file.hasMainMethod);
 }

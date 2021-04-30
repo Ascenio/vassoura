@@ -1,3 +1,5 @@
-int coolFunction() {
-  return 42;
+import 'dart:math';
+
+double coolFunction() {
+  return pow(2, 10);
 }
