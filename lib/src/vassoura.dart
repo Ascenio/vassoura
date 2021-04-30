@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:mime/mime.dart';
+import 'package:vassoura/vassoura.dart';
 
 Stream<File> getDartFiles(Directory directory) {
   return directory
@@ -26,4 +28,10 @@ List<String> cleanupImports(List<String> imports) {
     final matches = regex.allMatches(import);
     return matches.first.group(1);
   }).toList();
+}
+
+Future<bool> fileHasMain(File file) async {
+  final program = await file.readAsString();
+  final hasMain = programHasMain(program);
+  return hasMain;
 }

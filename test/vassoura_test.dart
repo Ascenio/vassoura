@@ -41,4 +41,16 @@ void main() {
       'package:test/test.dart',
     ]);
   });
+
+  test('removes files with main method', () async {
+    final files = [
+      File('test/fixtures/hello.dart'),
+      File('test/fixtures/some_folder/another_hello.dart'),
+    ];
+    final futures = files.map(fileHasMain);
+    final hasMain = await Future.wait(futures);
+
+    expect(hasMain[0], isTrue);
+    expect(hasMain[1], isFalse);
+  });
 }

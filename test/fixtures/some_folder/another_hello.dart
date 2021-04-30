@@ -1,3 +1,3 @@
-void main() {
-  print("What's up?");
+int coolFunction() {
+  return 42;
 }

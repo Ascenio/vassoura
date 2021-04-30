@@ -1,15 +1,16 @@
 import 'dart:io';
 
 import 'package:vassoura/vassoura.dart';
-import 'package:mime/mime.dart';
 
 void main(List<String> arguments) async {
   final files = getDartFiles(Directory.current);
   await for (final file in files) {
-    final mime = lookupMimeType(file.path);
+    final hasMain = await fileHasMain(file);
     final imports = await mapFileToImports(file);
-    print('$file -> $mime');
-    print('$file -> $imports');
+    if (hasMain) {
+      print('[MAIN] $file -> $imports');
+      continue;
+    }
     print('$file -> ${cleanupImports(imports)}');
   }
 }
