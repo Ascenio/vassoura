@@ -10,5 +10,6 @@ void main(List<String> arguments) async {
     final imports = await mapFileToImports(file);
     print('$file -> $mime');
     print('$file -> $imports');
+    print('$file -> ${cleanupImports(imports)}');
   }
 }

@@ -18,6 +18,7 @@ void main() {
       );
     });
   });
+
   test('maps a file to its imports', () async {
     final file = File('test/vassoura_test.dart');
     final imports = await mapFileToImports(file);
@@ -26,5 +27,18 @@ void main() {
       "import 'package:vassoura/src/vassoura.dart';",
       "import 'package:test/test.dart';",
     });
+  });
+
+  test('cleans up imports', () {
+    final imports = cleanupImports([
+      "import 'dart:io';",
+      "import 'package:vassoura/src/vassoura.dart';",
+      "import 'package:test/test.dart';",
+    ]);
+    expect(imports, [
+      'dart:io',
+      'package:vassoura/src/vassoura.dart',
+      'package:test/test.dart',
+    ]);
   });
 }
