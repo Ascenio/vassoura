@@ -63,4 +63,17 @@ void main() {
     final hasMain = programHasMain(program);
     expect(hasMain, isFalse);
   });
+
+  group('verifies if a import is absolute', () {
+    test('returns true when it is', () {
+      final import = 'package:vassoura/vassoura.dart';
+      expect(isAnAbsoluteImport(import), isTrue);
+    });
+
+    test('returns false when it is not', () {
+      final import =
+          '../../transformers/file_with_metadata_stream_transformer.dart';
+      expect(isAnAbsoluteImport(import), isFalse);
+    });
+  });
 }

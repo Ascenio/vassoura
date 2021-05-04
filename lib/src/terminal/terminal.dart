@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:args/args.dart';
 import 'package:meta/meta.dart';
 
+import '../exceptions/project_name_not_found.dart';
 import '../../vassoura.dart';
 
 class Terminal {
@@ -11,6 +12,7 @@ class Terminal {
   Terminal({@required this.parser});
 
   Future<void> call(List<String> arguments) async {
+    final result = parser.parse(arguments);
     if (arguments.isEmpty) {
       print(
         'Vassoura: removes files not referenced in the project\n'
@@ -18,14 +20,24 @@ class Terminal {
         'Available commands:\n'
         '${parser.usage}',
       );
-    } else {
-      final result = parser.parse(arguments);
-      if (result.options.contains(listOption)) {
-        final files = filesToDelete(Directory.current);
-        await for (final file in files) {
-          print(file);
+    } else if (result[listOption] as bool) {
+      final projectName = await getProjectName(Directory.current);
+      print('Project: $projectName');
+      await filesToDelete(Directory.current).forEach((file) async {
+        try {
+          final dependencies =
+              await mapFileToItsDependencies(file, Directory.current);
+          if (dependencies.isEmpty) {
+            return;
+          }
+          final dependenciesString =
+              dependencies.map((file) => file.path).toList();
+          print('File: $file');
+          print('Dependencies: $dependenciesString');
+        } on ProjectNameNotFound catch (error) {
+          print(error);
         }
-      }
+      });
     }
   }
 }

@@ -1,26 +1,29 @@
 import 'dart:io';
 
+import 'package:vassoura/src/exceptions/project_name_not_found.dart';
+import 'package:vassoura/src/file_with_metadata.dart';
 import 'package:vassoura/src/vassoura.dart';
 import 'package:test/test.dart';
 
 void main() {
   group('lists files recursively', () {
     test('with a given directory', () async {
-      final files = getDartFiles(Directory('test/fixtures'))
-          .map<String>((event) => event.path);
+      final files =
+          getDartFiles(Directory('test/fixtures/folder_with_recursive_files'))
+              .map<String>((file) => file.path);
       expect(
         files,
         emitsInAnyOrder([
-          'test/fixtures/hello.dart',
-          'test/fixtures/some_folder/another_hello.dart',
-          emitsDone
+          'test/fixtures/folder_with_recursive_files/hello.dart',
+          'test/fixtures/folder_with_recursive_files/some_folder/another_hello.dart',
+          //emitsDone
         ]),
       );
     });
   });
 
   test('maps a file to its imports', () async {
-    final file = File('test/vassoura_test.dart');
+    final file = File('test/fixtures/file_with_imports.dart');
     final imports = await mapFileToImports(file);
     expect(imports, {
       "import 'dart:io';",
@@ -53,4 +56,66 @@ void main() {
     expect(hasMain[0], isTrue);
     expect(hasMain[1], isFalse);
   });
+
+  group('find project name from pubspec.yaml', () {
+    group('works when file is valid', () {
+      const pubspecsFolder = 'test/fixtures/pubspecs';
+      test('when the name have no quotes', () async {
+        final directory = Directory('$pubspecsFolder/name_without_quotes');
+        final projectName = await getProjectName(directory);
+        expect(projectName, 'vassoura');
+      });
+
+      test('when the name have single quotes', () async {
+        final directory = Directory('$pubspecsFolder/name_with_single_quotes');
+        final projectName = await getProjectName(directory);
+        expect(projectName, 'vassoura');
+      });
+
+      test('when the name have double quotes', () async {
+        final directory = Directory('$pubspecsFolder/name_with_double_quotes');
+        final projectName = await getProjectName(directory);
+        expect(projectName, 'vassoura');
+      });
+    });
+
+    group('throws an error', () {
+      test("when there's no pubspec.yaml", () async {
+        final projectName = getProjectName(Directory.current.parent);
+        expect(() => projectName, throwsA(isA<ProjectNameNotFound>()));
+      });
+
+      test("when there's no name section in pubspec.yaml", () async {
+        final projectName = getProjectName(Directory('test/fixtures'));
+        expect(() => projectName, throwsA(isA<ProjectNameNotFound>()));
+      });
+    });
+  });
+
+  test('maps files to its dependencies', () async {
+    final file = File('test/vassoura_test.dart');
+    final fileWithMetadata = FileWithMetada(
+      file: file,
+      hasMainMethod: true,
+      imports: [
+        'dart:io',
+        'package:test/test.dart',
+        'package:vassoura/src/exceptions/project_name_not_found.dart',
+        'package:vassoura/src/file_with_metadata.dart',
+      ],
+    );
+    final dependencies =
+        await mapFileToItsDependencies(fileWithMetadata, Directory.current);
+    expect(
+      dependencies.map(fileToPath),
+      [
+        File('src/exceptions/project_name_not_found.dart').absolute,
+        File('src/file_with_metadata.dart').absolute,
+      ].map(fileToPath),
+    );
+  });
+}
+
+String fileToPath(File file) {
+  return file.path;
 }

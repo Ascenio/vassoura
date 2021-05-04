@@ -14,9 +14,24 @@ class FileWithMetada {
     @required this.imports,
   });
 
+  /// Returns every import, except the ones starting with `dart:foo`, e.g.: `dart:io`
+  List<String> get nonDartImports =>
+      imports.whereNot((import) => import.startsWith('dart:')).toList();
+
+  /// Returns only imports of the current project, which can be either
+  /// relative or absolute
+  List<String> projectImports(String projectName) {
+    return nonDartImports.where((import) {
+      if (import.startsWith('package:')) {
+        return import.startsWith('package:$projectName');
+      }
+      return true;
+    }).toList();
+  }
+
   @override
   String toString() {
-    return '${file.path} -> { hasMainMethod: $hasMainMethod, imports: $imports }';
+    return file.path;
   }
 
   @override
