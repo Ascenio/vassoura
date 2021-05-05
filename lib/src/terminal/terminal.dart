@@ -21,8 +21,14 @@ class Terminal {
         '${parser.usage}',
       );
     } else if (result[listOption] as bool) {
-      final projectName = await getProjectName(Directory.current);
-      print('Project: $projectName');
+      try {
+        final projectName = await getProjectName(Directory.current);
+        print('Project: $projectName');
+      } on ProjectNameNotFound {
+        print('Please run this command from your project\'s root');
+        exitCode = 1;
+        return;
+      }
       final sourcesAndImports =
           await filesToDelete(Directory.current).asyncMap((file) async {
         final dependencies =
