@@ -6,6 +6,7 @@ import 'package:meta/meta.dart';
 import '../exceptions/project_name_not_found.dart';
 import '../../vassoura.dart';
 import 'argparser.dart';
+import 'colors.dart';
 
 class Terminal {
   final ArgParser parser;
@@ -37,8 +38,21 @@ class Terminal {
       }).toList();
       final graph = buildDependecyGraph(sourcesAndImports);
       final graphOfFilesWithoutDependents = onlyFilesWithoutDependents(graph);
-      print('> $graphOfFilesWithoutDependents');
+      print('It seems like these files have no use: ${Colors.blue}');
+      _colorful(() {
+        graphOfFilesWithoutDependents.forEach(print);
+      }, color: Colors.blue);
     }
+  }
+
+  void _colorful(void Function() function, {Color color = Colors.reset}) {
+    _setColor(color);
+    function();
+    _setColor(Colors.reset);
+  }
+
+  void _setColor(Color color) {
+    stdout.write(color);
   }
 }
 
