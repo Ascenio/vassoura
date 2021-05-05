@@ -23,21 +23,18 @@ class Terminal {
     } else if (result[listOption] as bool) {
       final projectName = await getProjectName(Directory.current);
       print('Project: $projectName');
-      await filesToDelete(Directory.current).forEach((file) async {
-        try {
-          final dependencies =
-              await mapFileToItsDependencies(file, Directory.current);
-          if (dependencies.isEmpty) {
-            return;
-          }
-          final dependenciesString =
-              dependencies.map((file) => file.path).toList();
-          print('File: $file');
-          print('Dependencies: $dependenciesString');
-        } on ProjectNameNotFound catch (error) {
-          print(error);
-        }
-      });
+      final sourcesAndImports =
+          await filesToDelete(Directory.current).asyncMap((file) async {
+        final dependencies =
+            await mapFileToItsDependencies(file, Directory.current);
+        final dependenciesString =
+            dependencies.map((file) => file.path).toList();
+        print('File: $file');
+        print('Dependencies: $dependenciesString');
+        return MapEntry(file, dependencies);
+      }).toList();
+      final graph = buildDependecyGraph(sourcesAndImports);
+      print('> $graph');
     }
   }
 }

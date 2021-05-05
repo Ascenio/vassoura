@@ -115,6 +115,43 @@ void main() {
       ].map(fileToPath),
     );
   });
+
+  test('builds dependency graph correctly', () {
+    final fileA = FileWithMetada(
+      file: File('file_a.dart'),
+      hasMainMethod: false,
+      imports: [],
+    );
+    final fileB = FileWithMetada(
+      file: File('file_b.dart'),
+      hasMainMethod: false,
+      imports: [],
+    );
+    final fileC = FileWithMetada(
+      file: File('file_c.dart'),
+      hasMainMethod: false,
+      imports: [],
+    );
+    final sourcesAndImports = <MapEntry<FileWithMetada, List<File>>>[
+      MapEntry(fileA, [
+        fileB.file,
+        fileC.file,
+      ]),
+      MapEntry(fileB, [
+        fileA.file,
+        fileC.file,
+      ]),
+      MapEntry(fileC, [
+        fileA.file,
+      ]),
+    ];
+    final graph = buildDependecyGraph(sourcesAndImports);
+    expect(graph, {
+      fileA: [fileB.file, fileC.file],
+      fileB: [fileA.file],
+      fileC: [fileA.file, fileB.file],
+    });
+  });
 }
 
 String fileToPath(File file) {

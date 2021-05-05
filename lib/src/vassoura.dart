@@ -104,3 +104,32 @@ Future<List<File>> mapFileToItsDependencies(
     return importFile;
   }).toList();
 }
+
+/// Receives a list of files along with its imports
+Map<FileWithMetada, List<File>> buildDependecyGraph(
+  List<MapEntry<FileWithMetada, List<File>>> sourcesAndImports,
+) {
+  // because Dart doesn't support File equality by path
+  final pathToFileWithMetadataMap = sourcesAndImports
+      .fold<Map<String, FileWithMetada>>({}, (cache, sourceAndImport) {
+    final file = sourceAndImport.key;
+    final path = file.file.path;
+    cache[path] = file;
+    return cache;
+  });
+
+  return sourcesAndImports.fold<Map<FileWithMetada, List<File>>>({},
+      (graph, sourcesAndImports) {
+    final file = sourcesAndImports.key;
+    final dependencies = sourcesAndImports.value;
+    for (final dependency in dependencies) {
+      final path = dependency.path;
+      final fileWithMetadata = pathToFileWithMetadataMap[path];
+      if (fileWithMetadata != null) {
+        graph.putIfAbsent(fileWithMetadata, () => []);
+        graph[fileWithMetadata].add(file.file);
+      }
+    }
+    return graph;
+  });
+}
