@@ -4,6 +4,7 @@ import 'package:vassoura/src/exceptions/project_name_not_found.dart';
 import 'package:vassoura/src/file_with_metadata.dart';
 import 'package:vassoura/src/vassoura.dart';
 import 'package:test/test.dart';
+import 'package:vassoura/vassoura.dart';
 
 void main() {
   group('lists files recursively', () {
@@ -109,8 +110,8 @@ void main() {
     expect(
       dependencies.map(fileToPath),
       [
-        File('src/exceptions/project_name_not_found.dart').absolute,
-        File('src/file_with_metadata.dart').absolute,
+        File('lib/src/exceptions/project_name_not_found.dart').absolute,
+        File('lib/src/file_with_metadata.dart').absolute,
       ].map(fileToPath),
     );
   });

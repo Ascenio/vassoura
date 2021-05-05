@@ -90,7 +90,7 @@ Future<List<File>> mapFileToItsDependencies(
   return imports.map((import) {
     if (isAnAbsoluteImport(import)) {
       final absolutePath =
-          '${rootDirectory.path}/${import.replaceFirst('package:$projectName/', '')}';
+          '${rootDirectory.path}/${import.replaceFirst('package:$projectName/', 'lib/')}';
       final importFile = File(absolutePath);
       return importFile;
     }
