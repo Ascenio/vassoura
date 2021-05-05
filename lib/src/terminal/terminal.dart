@@ -5,11 +5,12 @@ import 'package:meta/meta.dart';
 
 import '../exceptions/project_name_not_found.dart';
 import '../../vassoura.dart';
+import 'argparser.dart';
 
 class Terminal {
   final ArgParser parser;
 
-  Terminal({@required this.parser});
+  Terminal._({@required this.parser});
 
   Future<void> call(List<String> arguments) async {
     final result = parser.parse(arguments);
@@ -22,8 +23,7 @@ class Terminal {
       );
     } else if (result[listOption] as bool) {
       try {
-        final projectName = await getProjectName(Directory.current);
-        print('Project: $projectName');
+        await getProjectName(Directory.current);
       } on ProjectNameNotFound {
         print('Please run this command from your project\'s root');
         exitCode = 1;
@@ -33,10 +33,6 @@ class Terminal {
           await filesToDelete(Directory.current).asyncMap((file) async {
         final dependencies =
             await mapFileToItsDependencies(file, Directory.current);
-        final dependenciesString =
-            dependencies.map((file) => file.path).toList();
-        print('File: $file');
-        print('Dependencies: $dependenciesString');
         return MapEntry(file, dependencies);
       }).toList();
       final graph = buildDependecyGraph(sourcesAndImports);
@@ -46,19 +42,7 @@ class Terminal {
   }
 }
 
-const listOption = 'list';
-
-ArgParser makeArgParser() {
-  return ArgParser()
-    ..addFlag(
-      listOption,
-      abbr: 'l',
-      help: 'lists all files available to deletion',
-      negatable: false,
-    );
-}
-
 Terminal makeTerminal() {
   final parser = makeArgParser();
-  return Terminal(parser: parser);
+  return Terminal._(parser: parser);
 }
