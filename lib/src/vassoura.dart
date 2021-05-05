@@ -118,8 +118,8 @@ Map<FileWithMetada, List<File>> buildDependecyGraph(
     return cache;
   });
 
-  return sourcesAndImports.fold<Map<FileWithMetada, List<File>>>({},
-      (graph, sourcesAndImports) {
+  final graphOfFilesWithDependents = sourcesAndImports
+      .fold<Map<FileWithMetada, List<File>>>({}, (graph, sourcesAndImports) {
     final file = sourcesAndImports.key;
     final dependencies = sourcesAndImports.value;
     for (final dependency in dependencies) {
@@ -132,4 +132,18 @@ Map<FileWithMetada, List<File>> buildDependecyGraph(
     }
     return graph;
   });
+  final filesWithoutDependents = sourcesAndImports.where((sourceAndImport) =>
+      !graphOfFilesWithDependents.containsKey(sourceAndImport.key));
+  final graph = {...graphOfFilesWithDependents}
+    ..addEntries(filesWithoutDependents);
+  return graph;
+}
+
+List<FileWithMetada> onlyFilesWithoutDependents(
+  Map<FileWithMetada, List<File>> graph,
+) {
+  return graph.entries
+      .where((sourceAndDependents) => sourceAndDependents.value.isEmpty)
+      .map((sourceAndDependents) => sourceAndDependents.key)
+      .toList();
 }

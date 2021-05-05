@@ -34,7 +34,8 @@ class Terminal {
         return MapEntry(file, dependencies);
       }).toList();
       final graph = buildDependecyGraph(sourcesAndImports);
-      print('> $graph');
+      final graphOfFilesWithoutDependents = onlyFilesWithoutDependents(graph);
+      print('> $graphOfFilesWithoutDependents');
     }
   }
 }

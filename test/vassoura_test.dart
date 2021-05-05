@@ -116,41 +116,95 @@ void main() {
     );
   });
 
-  test('builds dependency graph correctly', () {
-    final fileA = FileWithMetada(
-      file: File('file_a.dart'),
-      hasMainMethod: false,
-      imports: [],
-    );
-    final fileB = FileWithMetada(
-      file: File('file_b.dart'),
-      hasMainMethod: false,
-      imports: [],
-    );
-    final fileC = FileWithMetada(
-      file: File('file_c.dart'),
-      hasMainMethod: false,
-      imports: [],
-    );
-    final sourcesAndImports = <MapEntry<FileWithMetada, List<File>>>[
-      MapEntry(fileA, [
-        fileB.file,
-        fileC.file,
-      ]),
-      MapEntry(fileB, [
-        fileA.file,
-        fileC.file,
-      ]),
-      MapEntry(fileC, [
-        fileA.file,
-      ]),
-    ];
-    final graph = buildDependecyGraph(sourcesAndImports);
-    expect(graph, {
-      fileA: [fileB.file, fileC.file],
-      fileB: [fileA.file],
-      fileC: [fileA.file, fileB.file],
+  group('builds dependency graph', () {
+    test('adds files with corresponding dependents', () {
+      final fileA = FileWithMetada(
+        file: File('file_a.dart'),
+        hasMainMethod: false,
+        imports: [],
+      );
+      final fileB = FileWithMetada(
+        file: File('file_b.dart'),
+        hasMainMethod: false,
+        imports: [],
+      );
+      final fileC = FileWithMetada(
+        file: File('file_c.dart'),
+        hasMainMethod: false,
+        imports: [],
+      );
+      final sourcesAndImports = <MapEntry<FileWithMetada, List<File>>>[
+        MapEntry(fileA, [
+          fileB.file,
+          fileC.file,
+        ]),
+        MapEntry(fileB, [
+          fileA.file,
+          fileC.file,
+        ]),
+        MapEntry(fileC, [
+          fileA.file,
+        ]),
+      ];
+      final graph = buildDependecyGraph(sourcesAndImports);
+      expect(graph, {
+        fileA: [fileB.file, fileC.file],
+        fileB: [fileA.file],
+        fileC: [fileA.file, fileB.file],
+      });
     });
+
+    test('accounts for files without dependents', () {
+      final fileA = FileWithMetada(
+        file: File('file_a.dart'),
+        hasMainMethod: false,
+        imports: [],
+      );
+      final fileB = FileWithMetada(
+        file: File('file_b.dart'),
+        hasMainMethod: false,
+        imports: [],
+      );
+      final fileC = FileWithMetada(
+        file: File('file_c.dart'),
+        hasMainMethod: false,
+        imports: [],
+      );
+      final sourcesAndImports = <MapEntry<FileWithMetada, List<File>>>[
+        MapEntry(fileA, [fileB.file]),
+        MapEntry(fileB, [fileA.file]),
+        MapEntry(fileC, []),
+      ];
+      final graph = buildDependecyGraph(sourcesAndImports);
+      expect(graph, {
+        fileA: [fileB.file],
+        fileB: [fileA.file],
+        fileC: [],
+      });
+    });
+  });
+
+  test('filter graph by files which have dependents', () {
+    final fileWithoutDependents = FileWithMetada(
+        file: File('file_b.dart'), imports: [], hasMainMethod: false);
+    final anotherFileWithoutDependents = FileWithMetada(
+        file: File('file_d.dart'), imports: [], hasMainMethod: false);
+    final graph = <FileWithMetada, List<File>>{
+      FileWithMetada(
+          file: File('file_a.dart'), imports: [], hasMainMethod: false): [
+        File('file_b.dart'),
+        File('file_c.dart'),
+      ],
+      fileWithoutDependents: [],
+      FileWithMetada(
+          file: File('file_c.dart'), imports: [], hasMainMethod: false): [
+        File('file_b.dart'),
+        File('file_c.dart'),
+      ],
+      anotherFileWithoutDependents: [],
+    };
+    final result = onlyFilesWithoutDependents(graph);
+    expect(result, [fileWithoutDependents, anotherFileWithoutDependents]);
   });
 }
 
