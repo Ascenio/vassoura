@@ -8,11 +8,14 @@ import '../../vassoura.dart';
 import 'argparser.dart';
 import 'colors.dart';
 
+/// Interacts with the user and contains most CLI related logic
 class Terminal {
+  /// Terminal configurations
   final ArgParser parser;
 
   Terminal._({@required this.parser});
 
+  /// Starts the whole thing
   Future<void> call(List<String> arguments) async {
     final result = parser.parse(arguments);
     if (arguments.isEmpty) {
@@ -45,17 +48,20 @@ class Terminal {
     }
   }
 
+  /// Creates a scope for colorful printing
   void _colorful(void Function() function, {Color color = Colors.reset}) {
     _setColor(color);
     function();
     _setColor(Colors.reset);
   }
 
+  /// Sets up color for following prints
   void _setColor(Color color) {
     stdout.write(color);
   }
 }
 
+/// Default terminal factory
 Terminal makeTerminal() {
   final parser = makeArgParser();
   return Terminal._(parser: parser);

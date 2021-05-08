@@ -5,6 +5,7 @@ import 'package:vassoura/src/file_with_metadata.dart';
 import '../../vassoura.dart';
 import 'async_stream_transformer.dart';
 
+/// Reads a file, providing its metadata
 class FileWithMetadataStreamTransformer
     extends AsyncStreamTransformer<File, FileWithMetada> {
   FileWithMetadataStreamTransformer() : super(_fileWithMetadataMapper);

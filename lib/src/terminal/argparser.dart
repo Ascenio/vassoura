@@ -2,6 +2,7 @@ import 'package:args/args.dart';
 
 const listOption = 'list';
 
+/// Sets up available commands and arguments to the terminal
 ArgParser makeArgParser() {
   return ArgParser()
     ..addFlag(

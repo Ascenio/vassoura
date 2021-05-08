@@ -1,5 +1,7 @@
 import 'dart:async';
 
+/// A helper transformer which provides *parallel* processing of
+/// up to [_futureCountMax] simultaneous futures
 class AsyncStreamTransformer<I, O> extends StreamTransformerBase<I, O> {
   final StreamController<O> _controller;
   final Future<O> Function(I) _mapper;

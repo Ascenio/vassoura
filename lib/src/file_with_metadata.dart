@@ -3,9 +3,16 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
+/// Represents a dart file and its associated information
 class FileWithMetada {
+  /// The actual file
   final File file;
+
+  /// Presence of a `main` method
   final bool hasMainMethod;
+
+  /// Already cleaned imports of the file.
+  /// e.g.: `foo.dart`
   final List<String> imports;
 
   const FileWithMetada({
@@ -29,11 +36,13 @@ class FileWithMetada {
     }).toList();
   }
 
+  /// Needed for printing/debugging
   @override
   String toString() {
     return file.path;
   }
 
+  /// Neeeded for equality checking
   @override
   bool operator ==(Object o) {
     if (identical(this, o)) return true;
@@ -45,6 +54,7 @@ class FileWithMetada {
         listEquals(o.imports, imports);
   }
 
+  /// Neeeded for equality checking
   @override
   int get hashCode => file.hashCode ^ hasMainMethod.hashCode ^ imports.hashCode;
 }
