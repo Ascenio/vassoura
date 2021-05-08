@@ -11,7 +11,7 @@ Find files your project doesn't need anymore and make your project cleaner.
 Run the following command:
 
 ```sh
-pub global activate vas
+pub global activate vassoura
 ```
 
 
