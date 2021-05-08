@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:vassoura/vassoura.dart';
+import 'package:vassoura/src/utils.dart';
 
 void main() {
   group('detects files with main method', () {

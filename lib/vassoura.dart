@@ -1,3 +1,3 @@
-export 'src/vassoura.dart';
-export 'src/utils.dart';
+export 'src/file_with_metadata.dart';
 export 'src/terminal/terminal.dart';
+export 'src/vassoura.dart';

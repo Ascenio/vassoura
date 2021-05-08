@@ -1,7 +1,6 @@
 import 'dart:io';
 
-import 'package:vassoura/src/file_with_metadata.dart';
-
+import '../file_with_metadata.dart';
 import '../../vassoura.dart';
 import 'async_stream_transformer.dart';
 

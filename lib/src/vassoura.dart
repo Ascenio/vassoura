@@ -5,10 +5,10 @@ import 'dart:io';
 import 'package:mime/mime.dart';
 import 'package:path/path.dart';
 
-import '../vassoura.dart';
 import 'exceptions/project_name_not_found.dart';
 import 'file_with_metadata.dart';
 import 'transformers/file_with_metadata_stream_transformer.dart';
+import 'utils.dart';
 
 /// Scans the project tree from its root searching for `.dart` files
 Stream<File> getDartFiles(Directory directory) {
