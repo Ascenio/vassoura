@@ -26,7 +26,8 @@ class Terminal {
       );
     } else if (result[listOption] as bool) {
       try {
-        await getProjectName(Directory.current);
+        final project = await getProjectName(Directory.current);
+        print('Scanning $project..');
       } on ProjectNameNotFound {
         print('Please run this command from your project\'s root');
         exitCode = 1;
