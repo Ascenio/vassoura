@@ -58,7 +58,7 @@ Future<bool> fileHasMain(File file) async {
 }
 
 /// Scans for files which you *should* delete
-Stream<FileWithMetada> filesToDelete(Directory directory) {
+Stream<FileWithMetada> getDartFilesWithMetadata(Directory directory) {
   return getDartFiles(directory).transform(FileWithMetadataStreamTransformer());
 }
 
@@ -171,4 +171,18 @@ List<FileWithMetada> onlyFilesWithoutDependents(
       .where((sourceAndDependents) => sourceAndDependents.value.isEmpty)
       .map((sourceAndDependents) => sourceAndDependents.key)
       .toList();
+}
+
+/// Reads the [directory] scanning for files, building dependency graph
+/// and filtering only the files which should be deleted
+Future<List<FileWithMetada>> filesToDelete(Directory directory) async {
+  final sourcesAndImports =
+      await getDartFilesWithMetadata(directory).asyncMap((file) async {
+    final dependencies =
+        await mapFileToItsDependencies(file, Directory.current);
+    return MapEntry(file, dependencies);
+  }).toList();
+  final graph = buildDependecyGraph(sourcesAndImports);
+  final graphOfFilesWithoutDependents = onlyFilesWithoutDependents(graph);
+  return graphOfFilesWithoutDependents;
 }

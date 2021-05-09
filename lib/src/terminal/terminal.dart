@@ -33,17 +33,10 @@ class Terminal {
         exitCode = 1;
         return;
       }
-      final sourcesAndImports =
-          await filesToDelete(Directory.current).asyncMap((file) async {
-        final dependencies =
-            await mapFileToItsDependencies(file, Directory.current);
-        return MapEntry(file, dependencies);
-      }).toList();
-      final graph = buildDependecyGraph(sourcesAndImports);
-      final graphOfFilesWithoutDependents = onlyFilesWithoutDependents(graph);
+      final files = await filesToDelete(Directory.current);
       print('It seems like these files have no use: ${Colors.blue}');
       _colorful(() {
-        graphOfFilesWithoutDependents.forEach(print);
+        files.forEach(print);
       }, color: Colors.blue);
     }
   }
