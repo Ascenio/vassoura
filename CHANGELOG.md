@@ -1,3 +1,10 @@
+# 0.1.0
+
+- Migrates to null safety
+- Adds an example
+- Updates the docs
+- Adds support for `part` statements
+
 ## 0.0.2
 
 - Small docs style and structural improvements
