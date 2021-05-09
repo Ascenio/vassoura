@@ -4,7 +4,13 @@
 
 Find files your project doesn't need anymore and make your project cleaner.
 
-> It's recommended to use it only once all files are commited, *just in case*.
+## How it works
+
+We scan through each file and look at the `import` and `part` statements. This way
+we know which file **imports** what, so we generated the inverse: for every **imported** file find out who imports it.
+
+> In the case of packages there are files which seem to be unnecessary, but that's because they are imported only indirectly (by the client of the lib). These files are suggested for deletion, but there's no way to differentiate them from the rest. So you may need to apply your 
+> own judgment.
 
 ## Installation
 
