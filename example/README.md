@@ -1,6 +1,6 @@
 # Example
 
-To illustrate a simple case let's download this very repo and run `vas` on it. Run the commands:
+To illustrate a simple case let's download this very repo and run `vas` on it.
 
 ```bash
 git clone https://github.com/Ascenio/vassoura
@@ -11,29 +11,16 @@ vas -l
 You'll get this response: 
 
 ```bash
-It seems like these files have no use:
-/tmp/tmp.BjD5aQB2dD/vassoura/test/fixtures/some_folder/another_hello.dart
-/tmp/tmp.BjD5aQB2dD/vassoura/test/fixtures/folder_with_recursive_files/some_folder/another_hello.dart
+Scanning vassoura..
+It seems like these files have no use: 
+/home/ascenio/code/vassoura/test/fixtures/parts_example/printer.dart
+/home/ascenio/code/vassoura/test/fixtures/some_folder/another_hello.dart
+/home/ascenio/code/vassoura/test/fixtures/folder_with_recursive_files/some_folder/another_hello.dart
+/home/ascenio/code/vassoura/test/fixtures/file_with_imports.dart
+/home/ascenio/code/vassoura/lib/src/terminal/terminal.dart
 ```
 
-If you take a look at them you'll see that they are basically this:
+The first four files do nothing, they are only read as files in tests.
+The last file is suspected not to be used, but that's because it's an entry point for the `lib/`. In this cases the file isn't imported directly, but may be used by the client, so we need to keep it.
 
-```dart
-// vassoura/test/fixtures/some_folder/another_hello.dart
-import 'dart:math';
-
-double coolFunction() {
-  return pow(2, 10) as double;
-}
-
-// vassoura/test/fixtures/folder_with_recursive_files/some_folder/another_hello.dart
-import 'dart:math';
-
-double coolFunction() {
-  return pow(2, 10) as double;
-}
-```
-
-Nowhere in this package they are imported, they are used only indirectly because they are fixtures for tests. Hopefully this has given an idea of how useful it can be in bigger code bases and made you consider trying it.
-
-Remember, It's very common during refactoring to leave a class or two which will accumulate over time, so it's always a good practice to clean up your project for the same reasons you refactored in the first place.
+> As seen above, sometimes you need to use your own judgement. It does work on packages, but you have to ignore the entry points.
