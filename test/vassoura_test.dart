@@ -23,27 +23,52 @@ void main() {
     });
   });
 
-  test('maps a file to its imports', () async {
-    final file = File('test/fixtures/file_with_imports.dart');
-    final imports = await mapFileToImports(file);
-    expect(imports, {
-      "import 'dart:io';",
-      "import 'package:vassoura/src/vassoura.dart';",
-      "import 'package:test/test.dart';",
+  group('maps a file', () {
+    test('to its imports', () async {
+      final file = File('test/fixtures/file_with_imports.dart');
+      final imports = await mapFileToImports(file);
+      expect(imports, {
+        "import 'dart:io';",
+        "import 'package:vassoura/src/vassoura.dart';",
+        "import 'package:test/test.dart';",
+      });
+    });
+
+    test('to its parts', () async {
+      final file = File('test/fixtures/parts_example/printer.dart');
+      final parts = await mapFileToImports(file, 'part');
+      expect(parts, {
+        "part 'helper_file.g.dart';",
+      });
     });
   });
 
-  test('cleans up imports', () {
-    final imports = cleanupImports([
-      "import 'dart:io';",
-      "import 'package:vassoura/src/vassoura.dart';",
-      "import 'package:test/test.dart';",
-    ]);
-    expect(imports, [
-      'dart:io',
-      'package:vassoura/src/vassoura.dart',
-      'package:test/test.dart',
-    ]);
+  group('cleans up', () {
+    test('imports', () {
+      final imports = cleanupImports([
+        "import 'dart:io';",
+        "import 'package:vassoura/src/vassoura.dart';",
+        "import 'package:test/test.dart';",
+      ]);
+      expect(imports, [
+        'dart:io',
+        'package:vassoura/src/vassoura.dart',
+        'package:test/test.dart',
+      ]);
+    });
+
+    test('parts', () {
+      final imports = cleanupImports([
+        "part 'counter.g.dart';",
+        "part 'union.freezed.dart';",
+        "part 'table.moor.dart';",
+      ], 'part');
+      expect(imports, [
+        'counter.g.dart',
+        'union.freezed.dart',
+        'table.moor.dart',
+      ]);
+    });
   });
 
   test('removes files with main method', () async {
@@ -104,14 +129,16 @@ void main() {
         'package:vassoura/src/exceptions/project_name_not_found.dart',
         'package:vassoura/src/file_with_metadata.dart',
       ],
+      parts: ['some_generated_file.g.dart'],
     );
     final dependencies =
         await mapFileToItsDependencies(fileWithMetadata, Directory.current);
     expect(
       dependencies.map(fileToPath),
       [
-        File('lib/src/exceptions/project_name_not_found.dart').absolute,
-        File('lib/src/file_with_metadata.dart').absolute,
+        File('lib/src/exceptions/project_name_not_found.dart'),
+        File('lib/src/file_with_metadata.dart'),
+        File('test/some_generated_file.g.dart'),
       ].map(fileToPath),
     );
   });
@@ -209,5 +236,5 @@ void main() {
 }
 
 String fileToPath(File file) {
-  return file.path;
+  return file.absolute.path;
 }

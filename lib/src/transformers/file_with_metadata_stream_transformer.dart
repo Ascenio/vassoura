@@ -13,11 +13,14 @@ class FileWithMetadataStreamTransformer
     final futures = await Future.wait([
       fileHasMain(file),
       mapFileToImports(file).then(cleanupImports),
+      mapFileToImports(file, 'part')
+          .then((imports) => cleanupImports(imports, 'part')),
     ]);
     return FileWithMetada(
       file: file,
       hasMainMethod: futures[0] as bool,
       imports: futures[1] as List<String>,
+      parts: futures[2] as List<String>,
     );
   }
 }

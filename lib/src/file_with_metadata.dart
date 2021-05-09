@@ -14,10 +14,15 @@ class FileWithMetada {
   /// e.g.: `foo.dart`
   final List<String> imports;
 
+  /// Already cleaned parts of the file.
+  /// e.g.: `foo.g.dart`
+  final List<String> parts;
+
   const FileWithMetada({
     required this.file,
     required this.hasMainMethod,
-    required this.imports,
+    this.imports = const [],
+    this.parts = const [],
   });
 
   /// Returns every import, except the ones starting with `dart:foo`, e.g.: `dart:io`

@@ -19,13 +19,16 @@ Stream<File> getDartFiles(Directory directory) {
       .cast<File>();
 }
 
-/// Reads a dart file and returns its imports
-Future<List<String>> mapFileToImports(File file) async {
+/// Reads a dart file and returns its imports or parts
+Future<List<String>> mapFileToImports(
+  File file, [
+  String importType = 'import',
+]) async {
   return file
       .openRead()
       .transform(utf8.decoder)
       .transform(LineSplitter())
-      .where((line) => line.startsWith(RegExp(r"\s*import '.*';")))
+      .where((line) => line.startsWith(RegExp("\\s*$importType '.*';")))
       .fold<List<String>>([], (lines, currentLine) => [...lines, currentLine]);
 }
 
@@ -36,9 +39,12 @@ Future<List<String>> mapFileToImports(File file) async {
 /// import 'foo.dart';
 /// ```
 /// Becomes `foo.dart`
-List<String> cleanupImports(List<String> imports) {
+List<String> cleanupImports(
+  List<String> imports, [
+  String importType = 'import',
+]) {
   return imports.map((import) {
-    final regex = RegExp(r"\s*import '(.*)';");
+    final regex = RegExp("\\s*$importType '(.*)';");
     final matches = regex.allMatches(import);
     return matches.first.group(1)!;
   }).toList();
@@ -53,9 +59,7 @@ Future<bool> fileHasMain(File file) async {
 
 /// Scans for files which you *should* delete
 Stream<FileWithMetada> filesToDelete(Directory directory) {
-  return getDartFiles(directory)
-      .transform(FileWithMetadataStreamTransformer())
-      .where((file) => !file.hasMainMethod);
+  return getDartFiles(directory).transform(FileWithMetadataStreamTransformer());
 }
 
 /// Gets the current project name from `pubspec.yaml`
@@ -99,7 +103,7 @@ Future<List<File>> mapFileToItsDependencies(
   Directory rootDirectory,
 ) async {
   final projectName = await getProjectName(rootDirectory);
-  final imports = file.projectImports(projectName);
+  final imports = [...file.projectImports(projectName), ...file.parts];
   return imports.map((import) {
     if (isAnAbsoluteImport(import)) {
       final absolutePath =
@@ -149,8 +153,10 @@ Map<FileWithMetada, List<File>> buildDependecyGraph(
     }
     return graph;
   });
-  final filesWithoutDependents = sourcesAndImports.where((sourceAndImport) =>
-      !graphOfFilesWithDependents.containsKey(sourceAndImport.key));
+  final filesWithoutDependents = sourcesAndImports
+      .where((sourceAndImport) =>
+          !graphOfFilesWithDependents.containsKey(sourceAndImport.key))
+      .map((sourceAndImport) => MapEntry(sourceAndImport.key, <File>[]));
   final graph = {...graphOfFilesWithDependents}
     ..addEntries(filesWithoutDependents);
   return graph;
@@ -161,6 +167,7 @@ List<FileWithMetada> onlyFilesWithoutDependents(
   Map<FileWithMetada, List<File>> graph,
 ) {
   return graph.entries
+      .where((sourceAndDependents) => !sourceAndDependents.key.hasMainMethod)
       .where((sourceAndDependents) => sourceAndDependents.value.isEmpty)
       .map((sourceAndDependents) => sourceAndDependents.key)
       .toList();
