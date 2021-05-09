@@ -40,7 +40,7 @@ List<String> cleanupImports(List<String> imports) {
   return imports.map((import) {
     final regex = RegExp(r"\s*import '(.*)';");
     final matches = regex.allMatches(import);
-    return matches.first.group(1);
+    return matches.first.group(1)!;
   }).toList();
 }
 
@@ -64,12 +64,12 @@ Future<String> getProjectName(Directory directory) async {
       .list()
       .where((file) => file is File)
       .where((file) => basename(file.path) == 'pubspec.yaml')
-      .cast<File>()
-      .firstWhere((name) => name != null, orElse: () => null);
+      .cast<File?>()
+      .firstWhere((file) => file != null, orElse: () => null);
   if (file == null) {
     throw ProjectNameNotFound("File pubspec.yaml doesn't exist");
   }
-  final projectName = file
+  final projectName = await file
       .openRead()
       .transform(utf8.decoder)
       .transform(LineSplitter())
@@ -77,14 +77,14 @@ Future<String> getProjectName(Directory directory) async {
       .map((line) {
     final simpleNameRegex = RegExp(r'name:\s*(\w+)');
     if (simpleNameRegex.hasMatch(line)) {
-      return simpleNameRegex.firstMatch(line).group(1);
+      return simpleNameRegex.firstMatch(line)!.group(1);
     }
     final nameWithSingleQuotesRegex = RegExp(r"name:\s*'(\w+)'");
     if (nameWithSingleQuotesRegex.hasMatch(line)) {
-      return nameWithSingleQuotesRegex.firstMatch(line).group(1);
+      return nameWithSingleQuotesRegex.firstMatch(line)!.group(1);
     }
     final nameWithDoubleQuotesRegex = RegExp(r'name:\s*"(\w+)"');
-    return nameWithDoubleQuotesRegex.firstMatch(line).group(1);
+    return nameWithDoubleQuotesRegex.firstMatch(line)!.group(1);
   }).firstWhere((name) => name != null, orElse: () => null);
   if (projectName == null) {
     throw ProjectNameNotFound(
@@ -144,7 +144,7 @@ Map<FileWithMetada, List<File>> buildDependecyGraph(
       final fileWithMetadata = pathToFileWithMetadataMap[path];
       if (fileWithMetadata != null) {
         graph.putIfAbsent(fileWithMetadata, () => []);
-        graph[fileWithMetadata].add(file.file);
+        graph[fileWithMetadata]!.add(file.file);
       }
     }
     return graph;

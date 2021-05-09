@@ -18,7 +18,7 @@ class AsyncStreamTransformer<I, O> extends StreamTransformerBase<I, O> {
 
   bool _finalizing;
 
-  StreamSubscription<I> _subscription;
+  late StreamSubscription<I> _subscription;
 
   @override
   Stream<O> bind(Stream<I> stream) {
@@ -41,7 +41,7 @@ class AsyncStreamTransformer<I, O> extends StreamTransformerBase<I, O> {
     _finalizing = true;
   }
 
-  void Function() _resumeCallback;
+  void Function()? _resumeCallback;
 
   void _onData(I data) {
     final future = _mapper(data);
@@ -64,7 +64,7 @@ class AsyncStreamTransformer<I, O> extends StreamTransformerBase<I, O> {
     _futureCount--;
     _controller.add(result);
     if (_futureCount < _futureCountMax && _resumeCallback != null) {
-      _resumeCallback();
+      _resumeCallback!();
     }
     if (_finalizing && _futureCount <= 0) {
       _controller.close();

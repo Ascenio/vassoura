@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:collection/collection.dart';
-import 'package:meta/meta.dart';
 
 /// Represents a dart file and its associated information
 class FileWithMetada {
@@ -16,9 +15,9 @@ class FileWithMetada {
   final List<String> imports;
 
   const FileWithMetada({
-    @required this.file,
-    @required this.hasMainMethod,
-    @required this.imports,
+    required this.file,
+    required this.hasMainMethod,
+    required this.imports,
   });
 
   /// Returns every import, except the ones starting with `dart:foo`, e.g.: `dart:io`

@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:args/args.dart';
-import 'package:meta/meta.dart';
 
 import '../../vassoura.dart';
 import '../exceptions/project_name_not_found.dart';
@@ -13,7 +12,7 @@ class Terminal {
   /// Terminal configurations
   final ArgParser parser;
 
-  Terminal._({@required this.parser});
+  Terminal._({required this.parser});
 
   /// Starts the whole thing
   Future<void> call(List<String> arguments) async {

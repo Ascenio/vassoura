@@ -16,8 +16,8 @@ class FileWithMetadataStreamTransformer
     ]);
     return FileWithMetada(
       file: file,
-      hasMainMethod: futures[0],
-      imports: futures[1],
+      hasMainMethod: futures[0] as bool,
+      imports: futures[1] as List<String>,
     );
   }
 }
